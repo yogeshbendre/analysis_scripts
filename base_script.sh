@@ -1,1 +1,1 @@
-python uiBootMonitor.py -f ./ -d ./delta1.txt -e ./delta2.txt
+python uiBootMonitor.py -f ../ -d ../delta1.txt -e ../delta2.txt
