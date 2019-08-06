@@ -45,7 +45,9 @@ def runCommand(mycmd):
 def processed(uiPID):
     
     try:
+        print("Check PID: "+uiPID)
         uiBootData = json.load(open(uiBootDataJSON,"r"))
+        print(uiBootData)
         if "vspher-ui_"+str(uiPID) in uiBootData.keys():
             return(True)
         else:
