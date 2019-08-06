@@ -48,7 +48,7 @@ def processed(uiPID):
         print("Check PID: "+uiPID)
         uiBootData = json.load(open(uiBootDataJSON,"r"))
         print(uiBootData)
-        if "vspher-ui_"+str(uiPID) in uiBootData.keys():
+        if "vsphere-ui_"+str(uiPID) in uiBootData.keys():
             return(True)
         else:
             return(False)
