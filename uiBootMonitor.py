@@ -520,6 +520,11 @@ def grepUiComponentTimes(hostname):
         uiStartTime = mytimedata[-2].replace("\n","")
         uiPIDTime = mytimedata[-1].replace("\n","")
         uiPID = mytimedata[3].replace("\n","")
+        
+        if processed(uiPID):
+            print("Already Processed PID: "+uiPID)
+            return(None, None, None, None)
+        
         print(str(uiPID)+" "+uiPIDTime+" "+uiStartTime)
         uiTook = round(dt.strptime(uiStartTime,"%Y-%m-%d %H:%M:%S.%f").timestamp()-dt.strptime(uiPIDTime,"%Y-%m-%d %H:%M:%S.%f").timestamp())
         print("Received my data")
