@@ -89,9 +89,7 @@ def getuiTimesFromJson():
 #            print(parts)
 
             if parts[0]=='vsphere-ui':
-                if processed(parts[1]):
-                    continue
-                print("Unprocessed instance")
+                print("Instance")
                 print(p)
                 d1 = uiData[p]
                 print(d1)
