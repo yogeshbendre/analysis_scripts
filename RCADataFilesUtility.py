@@ -36,7 +36,9 @@ def pushToDeltaFile(filename,myheader,mycsvdata,deleteIfNoData=True):
 def pushToFullFile(filename,myheader,mycsvdata):
 
     print("pushToFullFile: "+filename)    
-    
+    if mycsvdata is None:
+        print("No data to push for "+filename)
+        return
     try:
         fp=open(filename,"r")
         fp.close()
