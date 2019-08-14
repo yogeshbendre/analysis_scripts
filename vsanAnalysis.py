@@ -157,6 +157,9 @@ def analyzeRedVsanClusters():
             with open(outputdir+"index.html","w") as fp2:
                 fp2.write(myhtml)
             
+            with open("/var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/vsanrvc.html","w") as fp2:
+                fp2.write(myhtml)
+            
             
     except Exception as e3:
         print(str(e3))
