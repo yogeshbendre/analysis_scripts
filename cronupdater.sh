@@ -2,7 +2,7 @@
 crontab -l > testmycron
 #echo new cron into cron file
 {
-cat testmycron | grep "install_scripts.sh" &&
+cat testmycron | grep "install_script.sh" &&
 echo "Cron already exist"
 } || {
 echo "Setup cron" 
