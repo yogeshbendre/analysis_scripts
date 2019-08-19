@@ -6,7 +6,7 @@ cat testmycron | grep "install_scripts.sh" &&
 echo "Cron already exist"
 } || {
 echo "Setup cron" 
-echo "*/5 * * * * /root/analysis_scripts/install_scripts.sh" >> testmycron
+echo "*/5 * * * * /root/analysis_scripts/install_script.sh" >> testmycron
 #install new cron file
 crontab testmycron
 }
