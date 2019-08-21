@@ -176,6 +176,58 @@ def getFromStdErrFile(errFile):
     return mycsvdata
         
 
+def computeSPSEventTime(m1,m2,mycomp):
+    global vcName
+    global myPID
+    hostname = vcName
+    
+    mytime1 = m1.split(" ")[0].replace("T"," ").replace("Z","")
+    mytime1 = dt.strptime(mytime1,'%Y-%m-%d %H:%M:%S.%f')
+    mytimestamp1 = mytime1.timestamp()
+    mytime1 = str(mytime1)+'.000'
+    
+    mytime2 = m2.split(" ")[0].replace("T"," ").replace("Z","")
+    mytime2 = dt.strptime(mytime2,'%Y-%m-%d %H:%M:%S.%f')
+    mytimestamp2 = mytime2.timestamp()
+    mytime2 = str(mytime2)+'.000'
+    
+    mytook = round(mytimestamp2-mytimestamp1)
+    d1 = str(mytimestamp1)+"|"+str(hostname)+"|"+str(mycomp)+"|"+str(myPID)+"|"+str(mytook)+"|"+str(mytime2)+"|"+str(mytime1)+"|"+str(mycomp)+" (sps)\n"            
+    
+
+
+def getFromSPSLogFile(logFile):
+    mycsvdata = None
+    try:
+            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting PBM container"')
+            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "Starting background jobs in PBM"')
+            d1 = computeSPSEventTime(myout1,myout2,"PBM Service")
+            print("New Entry: "+d1)
+            mycsvdata = ''
+            mycsvdata = mycsvdata+d1
+            
+            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting SMS container"')
+            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "vCenter Storage Monitoring Service initialized successfully"')
+            d1 = computeSPSEventTime(myout1,myout2,"SMS Service")
+            print("New Entry: "+d1)
+            mycsvdata = mycsvdata+d1
+            
+            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting VSLM container"')
+            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "Starting background jobs in VSLM"')
+            d1 = computeSPSEventTime(myout1,myout2,"VSLM Service")
+            print("New Entry: "+d1)
+            mycsvdata = mycsvdata+d1
+            
+            
+            
+            
+    except Exception as e3:
+        print('getFromSPSLogFile failed: '+str(e3))
+    
+    return mycsvdata
+
+
+
 
 def getTomcatTimeOf_lookupsvc():
     global serviceName
@@ -198,6 +250,36 @@ def getTomcatTimeOf_lookupsvc():
         errFile = "/var/log/vmware/lookupsvc/"+errFile
         print(errFile)
         mycsv = getFromStdErrFile(errFile)
+        mycsv=myrestartInstance+"|lookupsvc green (vmon)\n"+mycsv
+        
+        BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
+        
+        
+        
+        return mycsv
+
+
+def getTomcatTimeOf_sps():
+    global serviceName
+    global myPID
+    global ServiceBootDataJSON
+    mycsv = None
+    mybootInfo,myrestartInstance = BDT.getLastBootInstance(serviceName)
+    if mybootInfo is None:
+        print("Could not find info about lookupsvc")
+        return None
+    else:
+        print(mybootInfo)
+        myPID = mybootInfo['PID']
+        
+        if(BDT.processed(myPID,ServiceBootDataJSON,serviceName)):
+            print("Already processed latest instance: "+myrestartInstance)
+            return None
+        
+        #errFile = getLatestFile("/var/log/vmware/lookupsvc/","stderr")
+        logFile = "/var/log/vmware/vmware-sps/sps.log"
+        print(logFile)
+        mycsv = getFromSPSLogFile(logFile)
         mycsv=myrestartInstance+"|lookupsvc green (vmon)\n"+mycsv
         
         BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
