@@ -15,6 +15,7 @@ import sys
 import inspect
 import RCADataFilesUtility as RDF
 import BootDataUtility as BDT
+#import BDT as BDT
 
 serviceName=None
 ServiceBootDataJSON = '/var/log/vmware/serviceBootData.json'
@@ -29,7 +30,7 @@ myPID = 0
 
 def getTomcatTimeOfService(sname):
     sname = sname.lower()
-    sname = sname.replace("vmware-","")
+    sname = sname.replace("vmware-","").replace("-","_")
     myf = getattr(sys.modules[__name__], "getTomcatTimeOf_%s" % sname)
     mycsv=myf()
     print("Recieved csv : "+str(mycsv))
@@ -176,6 +177,164 @@ def getFromStdErrFile(errFile):
     return mycsvdata
         
 
+def grepIntoFile(filepath,pattern):
+    myout = BDT.runCommand('cat '+filepath+' | grep "'+pattern+'"')
+    myout = myout.split("\\n")[:-1]
+    return myout
+    
+def getCLSEvents(logFile):
+    mydict = {}
+    #filename = "/root/ysbcls/cls.log"
+    filename = logFile
+    
+    try:
+        #Loading XML bean definitions
+        myout = grepIntoFile(filename,"Loading XML bean definitions")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Loading XML bean definitions")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getCLSEvents failed for Package: "+str(e1))
+        
+    try:
+        #Initializing
+        myout = grepIntoFile(filename,"Initializing")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Initializing")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getCLSEvents failed for Package: "+str(e1))
+        
+    
+    try:
+        #Initializing
+        myout = grepIntoFile(filename,"Registered the service")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Register Services")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getCLSEvents failed for Package: "+str(e1))
+        
+    try:
+        #Server
+        myout = grepIntoFile(filename,"TcServer")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Start Server")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getCLSEvents failed for Package: "+str(e1))
+    mycsv = None
+    try:
+        mycsv = ''
+        mytimes = list(mydict.keys())
+        mytimes.sort()
+        
+        for t in mytimes:
+            mycsv = mycsv + mydict[t]
+        print("Built CSV Data:")
+        print(mycsv)
+        return mycsv
+    except Exception as e6:
+        print("getCLSEvents failed to sort:"+str(e6))
+    
+    
+
+def getSPSEvents(logFile):
+    mydict = {}
+    #filename = "/var/core/temp/sps.log.1"
+    filename = logFile
+    
+    try:
+        #Package Loads
+        myout = grepIntoFile(filename," Package")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Package Loading")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getSPSEvents failed for Package: "+str(e1))
+        
+    try:
+        #Datastore processing
+        myout = grepIntoFile(filename,"\[main\].*FCD Datastore Initialized")
+        mydslen = len(myout)
+        m1 = myout[0]
+        myout = grepIntoFile(filename,"Added FCDDatastore")
+        m2 = myout[-1]
+        msg,mt = computeSPSEventTime(m1,m2,"Initialize and Add "+str(mydslen)+" Datastores")
+        print("My Message")
+        print(msg)
+        
+        mydict[mt] = msg
+    except Exception as e2:
+        print("getSPSEvents failed for Datastore Processing:"+str(e2))
+        
+    try:    
+        #PBM
+        myout = grepIntoFile(filename,"Starting PBM container")
+        m1 = myout[0]
+        
+        myout = grepIntoFile(filename,"Starting background jobs in PBM")
+        m2 = myout[0]
+        
+        msg,mt = computeSPSEventTime(m1,m2,"PBM Service")
+        print("My Message")
+        print(msg)
+        
+        mydict[mt] = msg
+    except Exception as e3:
+        print("getSPSEvents failed for PBM: "+str(e3))
+    
+    try:    
+        #SMS
+        myout = grepIntoFile(filename,"Starting SMS container")
+        m1 = myout[0]
+        
+        myout = grepIntoFile(filename,"vCenter Storage Monitoring Service initialized successfully")
+        m2 = myout[0]
+        
+        msg,mt = computeSPSEventTime(m1,m2,"SMS Service")
+        print("My Message")
+        print(msg)
+        
+        mydict[mt] = msg
+    except Exception as e4:
+        print("getSPSEvents failed for SMS:" + str(e4))
+    
+    try:
+        #VSLM
+        myout = grepIntoFile(filename,"Starting VSLM container")
+        m1 = myout[0]
+        
+        myout = grepIntoFile(filename,"Starting background jobs in VSLM")
+        m2 = myout[-1]
+        msg,mt = computeSPSEventTime(m1,m2,"VSLM Service")
+        print("My Message")
+        print(msg)
+        
+        mydict[mt] = msg
+    except Exception as e5:
+        print("getSPSEvents failed for VSLM:"+str(e5))
+    
+    mycsv = None
+    try:
+        mycsv = ''
+        mytimes = list(mydict.keys())
+        mytimes.sort()
+        
+        for t in mytimes:
+            mycsv = mycsv + mydict[t]
+        print("Built CSV Data:")
+        print(mycsv)
+        return mycsv
+    except Exception as e6:
+        print("getSPSEvents failed to sort:"+str(e6))
+    
+
 def computeSPSEventTime(m1,m2,mycomp):
     global vcName
     global myPID
@@ -184,7 +343,7 @@ def computeSPSEventTime(m1,m2,mycomp):
     mytime1 = m1.split(" ")[0].replace("T"," ").replace("Z","")
     mytime1 = dt.strptime(mytime1,'%Y-%m-%d %H:%M:%S.%f')
     mytimestamp1 = mytime1.timestamp()
-    mytime1 = str(mytime1)+'.000'
+    mytime1 = str(mytime1)
     
     mytime2 = m2.split(" ")[0].replace("T"," ").replace("Z","")
     mytime2 = dt.strptime(mytime2,'%Y-%m-%d %H:%M:%S.%f')
@@ -194,30 +353,14 @@ def computeSPSEventTime(m1,m2,mycomp):
     mytook = round(mytimestamp2-mytimestamp1)
     d1 = str(mytimestamp1)+"|"+str(hostname)+"|"+str(mycomp)+"|"+str(myPID)+"|"+str(mytook)+"|"+str(mytime2)+"|"+str(mytime1)+"|"+str(mycomp)+" (sps)\n"            
     
+    return (d1,mytimestamp1)
 
 
 def getFromSPSLogFile(logFile):
     mycsvdata = None
     try:
-            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting PBM container"')
-            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "Starting background jobs in PBM"')
-            d1 = computeSPSEventTime(myout1,myout2,"PBM Service")
-            print("New Entry: "+d1)
-            mycsvdata = ''
-            mycsvdata = mycsvdata+d1
-            
-            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting SMS container"')
-            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "vCenter Storage Monitoring Service initialized successfully"')
-            d1 = computeSPSEventTime(myout1,myout2,"SMS Service")
-            print("New Entry: "+d1)
-            mycsvdata = mycsvdata+d1
-            
-            myout1 = BDT.runCommand('cat '+logFile+' | grep -i "Starting VSLM container"')
-            myout2 = BDT.runCommand('cat '+logFile+' | grep -i "Starting background jobs in VSLM"')
-            d1 = computeSPSEventTime(myout1,myout2,"VSLM Service")
-            print("New Entry: "+d1)
-            mycsvdata = mycsvdata+d1
-            
+            mycsvdata = getSPSEvents(logFile)
+            return mycsvdata
             
             
             
@@ -226,6 +369,19 @@ def getFromSPSLogFile(logFile):
     
     return mycsvdata
 
+
+def getFromCLSLogFile(logFile):
+    mycsvdata = None
+    try:
+            mycsvdata = getCLSEvents(logFile)
+            return mycsvdata
+            
+            
+            
+    except Exception as e3:
+        print('getFromSPSLogFile failed: '+str(e3))
+    
+    return mycsvdata
 
 
 
@@ -280,7 +436,35 @@ def getTomcatTimeOf_sps():
         logFile = "/var/log/vmware/vmware-sps/sps.log"
         print(logFile)
         mycsv = getFromSPSLogFile(logFile)
-        mycsv=myrestartInstance+"|lookupsvc green (vmon)\n"+mycsv
+        mycsv=myrestartInstance+"|sps green (vmon)\n"+mycsv
+        
+        BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
+        
+        
+        
+        return mycsv
+def getTomcatTimeOf_content_library():
+    global serviceName
+    global myPID
+    global ServiceBootDataJSON
+    mycsv = None
+    mybootInfo,myrestartInstance = BDT.getLastBootInstance(serviceName)
+    if mybootInfo is None:
+        print("Could not find info about lookupsvc")
+        return None
+    else:
+        print(mybootInfo)
+        myPID = mybootInfo['PID']
+        
+        if(BDT.processed(myPID,ServiceBootDataJSON,serviceName)):
+            print("Already processed latest instance: "+myrestartInstance)
+            return None
+        
+        #errFile = getLatestFile("/var/log/vmware/lookupsvc/","stderr")
+        logFile = "/var/log/vmware/content-library/cls.log"
+        print(logFile)
+        mycsv = getFromCLSLogFile(logFile)
+        mycsv=myrestartInstance+"|sps green (vmon)\n"+mycsv
         
         BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
         
