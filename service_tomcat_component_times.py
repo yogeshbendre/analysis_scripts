@@ -14,8 +14,8 @@ import argparse
 import sys
 import inspect
 import RCADataFilesUtility as RDF
-import BootDataUtility as BDT
-#import BDT as BDT
+#import BootDataUtility as BDT
+import BDT as BDT
 
 serviceName=None
 ServiceBootDataJSON = '/var/log/vmware/serviceBootData.json'
@@ -316,6 +316,68 @@ def getSVCSEvents(logFile):
     
 
 
+def getvSanHealthEvents(logFile):
+    mydict = {}
+    filename = logFile
+    
+    try:
+        #Loaded bindings
+        myout = grepIntoFile(filename,"Loaded bindings")
+        print(len(myout))
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Loaded bindings")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getSVCSEvents failed for Package: "+str(e1))
+        
+    try:
+        #Importing
+        myout = grepIntoFile(filename," Importing")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Imports")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getCLSEvents failed for Initializing: "+str(e1))
+        
+    
+    try:
+        #Initialized
+        myout = grepIntoFile(filename," Initialized")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Initialization")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getSVCSEvents failed for Package: "+str(e1))
+        
+    try:
+        #started.
+        myout = grepIntoFile(filename," started\.")
+        msg,mt = computeSPSEventTime(myout[0],myout[-1],"Server Started")
+        print("My Message")
+        print(msg)
+        mydict[mt] = msg
+    except Exception as e1:
+        print("getSVCSEvents failed for Package: "+str(e1))
+    
+    mycsv = None
+    try:
+        mycsv = ''
+        mytimes = list(mydict.keys())
+        mytimes.sort()
+        
+        for t in mytimes:
+            mycsv = mycsv + mydict[t]
+        print("Built CSV Data:")
+        print(mycsv)
+        return mycsv
+    except Exception as e6:
+        print("getvSanHealthEvents failed to sort:"+str(e6))
+    
+
+
 
 def getSPSEvents(logFile):
     mydict = {}
@@ -454,6 +516,19 @@ def computeSingleSEventTime(m1,mycomp,pattern):
 
 
 
+def getFromvSanHealthLogFile(logFile):
+    mycsvdata = None
+    try:
+            mycsvdata = getvSanHealthEvents(logFile)
+            return mycsvdata
+            
+            
+            
+    except Exception as e3:
+        print('getFromvSanHealthLogFile failed: '+str(e3))
+    
+    return mycsvdata
+
 def getFromSPSLogFile(logFile):
     mycsvdata = None
     try:
@@ -466,6 +541,8 @@ def getFromSPSLogFile(logFile):
         print('getFromSPSLogFile failed: '+str(e3))
     
     return mycsvdata
+
+
 
 
 def getFromSVCSLogFile(logFile):
@@ -553,7 +630,39 @@ def getTomcatTimeOf_sps():
         
         
         return mycsv
+
+def getTomcatTimeOf_vsan_health():
+    global serviceName
+    global myPID
+    global ServiceBootDataJSON
+    mycsv = None
+    mybootInfo,myrestartInstance = BDT.getLastBootInstance(serviceName)
+    if mybootInfo is None:
+        print("Could not find info about lookupsvc")
+        return None
+    else:
+        print(mybootInfo)
+        myPID = mybootInfo['PID']
+        
+        if(BDT.processed(myPID,ServiceBootDataJSON,serviceName)):
+            print("Already processed latest instance: "+myrestartInstance)
+            return None
+        
+        #errFile = getLatestFile("/var/log/vmware/lookupsvc/","stderr")
+        #logFile = "/var/log/vmware/vsan-health/vmware-vsan-health-service.log"
+        logFile = "/var/core/temp/vsh.txt"
+        print(logFile)
+        mycsv = getFromvSanHealthLogFile(logFile)
+        mycsv=myrestartInstance+"|vsan-health green (vmon)\n"+mycsv
+        
+        BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
+        
+        
+        
+        return mycsv
+
     
+
 def getTomcatTimeOf_content_library():
     global serviceName
     global myPID

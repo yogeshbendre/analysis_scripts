@@ -21,8 +21,9 @@ bootDataJSON = '/var/log/vmware/BootData.json'
 def runCommand(mycmd):
     print("Run Command: "+mycmd)
     try:
-        d = str(sp.check_output(mycmd,shell=True))
-        d = d.replace("b'","")
+        d = sp.check_output(mycmd,shell=True)
+        #d = d.replace("b'","")
+        d = d.decode("utf-8")
         d=d[:-1]
         print(d)    
         return d
