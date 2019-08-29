@@ -50,7 +50,11 @@ def getServiceComponentTimes(serviceName):
 
 
 def getLatestFile(folder,fname_pattern):
-    d = BDT.runCommand("ls -lrt "+folder+" | grep "+fname_pattern).split("\\n")[-2].split(" ")[-1]
+    d = BDT.runCommand("ls -lrt "+folder+" | grep "+fname_pattern)
+    if "\\n" in d:
+        d = d.split("\\n")[-2].split(" ")[-1]
+    else:
+        d = d.split("\n")[-2].split(" ")[-1]
     return d
 
 
@@ -620,8 +624,8 @@ def getTomcatTimeOf_eam():
             print("Already processed latest instance: "+myrestartInstance)
             return None
         
-        errFile = getLatestFile("/var/log/vmware/eam/","stderr")
-        errFile = "/var/log/vmware/eam/"+errFile
+        #errFile = getLatestFile("/var/log/vmware/eam/","stderr")
+        errFile = "/var/log/vmware/eam/jvm.log.stderr"
         print(errFile)
         mycsv = getFromStdErrFile(errFile)
         mycsv=myrestartInstance+"|eam green (vmon)\n"+mycsv
