@@ -5,3 +5,5 @@ python3 vsanAnalysis.py > /var/log/vmware/vsanout_analysis.txt 2> /var/log/vmwar
 python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s sps > /var/log/vmware/spsout_analysis.txt 2> /var/log/vmware/spsout_analysis.txt
 python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s content-library > /var/log/vmware/clsout_analysis.txt 2> /var/log/vmware/clsout_analysis.txt
 python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s vpxd-svcs > /var/log/vmware/svcsout_analysis.txt 2> /var/log/vmware/svcsout_analysis.txt
+python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s vsan-health > /var/log/vmware/vsanhealthout_analysis.txt 2> /var/log/vmware/vsanhealthout_analysis.txt
+python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s eam > /var/log/vmware/eamout_analysis.txt 2> /var/log/vmware/eamout_analysis.txt

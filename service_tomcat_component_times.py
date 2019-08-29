@@ -602,6 +602,38 @@ def getTomcatTimeOf_lookupsvc():
         return mycsv
 
 
+
+def getTomcatTimeOf_eam():
+    global serviceName
+    global myPID
+    global ServiceBootDataJSON
+    mycsv = None
+    mybootInfo,myrestartInstance = BDT.getLastBootInstance(serviceName)
+    if mybootInfo is None:
+        print("Could not find info about lookupsvc")
+        return None
+    else:
+        print(mybootInfo)
+        myPID = mybootInfo['PID']
+        
+        if(BDT.processed(myPID,ServiceBootDataJSON,serviceName)):
+            print("Already processed latest instance: "+myrestartInstance)
+            return None
+        
+        errFile = getLatestFile("/var/log/vmware/eam/","stderr")
+        errFile = "/var/log/vmware/eam/"+errFile
+        print(errFile)
+        mycsv = getFromStdErrFile(errFile)
+        mycsv=myrestartInstance+"|eam green (vmon)\n"+mycsv
+        
+        BDT.markProcessed(myPID,ServiceBootDataJSON,serviceName)
+        
+        
+        
+        return mycsv
+
+
+
 def getTomcatTimeOf_sps():
     global serviceName
     global myPID
