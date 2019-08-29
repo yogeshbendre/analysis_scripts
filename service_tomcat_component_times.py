@@ -14,8 +14,8 @@ import argparse
 import sys
 import inspect
 import RCADataFilesUtility as RDF
-#import BootDataUtility as BDT
-import BDT as BDT
+import BootDataUtility as BDT
+#import BDT as BDT
 
 serviceName=None
 ServiceBootDataJSON = '/var/log/vmware/serviceBootData.json'
@@ -649,8 +649,8 @@ def getTomcatTimeOf_vsan_health():
             return None
         
         #errFile = getLatestFile("/var/log/vmware/lookupsvc/","stderr")
-        #logFile = "/var/log/vmware/vsan-health/vmware-vsan-health-service.log"
-        logFile = "/var/core/temp/vsh.txt"
+        logFile = "/var/log/vmware/vsan-health/vmware-vsan-health-service.log"
+        #logFile = "/var/core/temp/vsh.txt"
         print(logFile)
         mycsv = getFromvSanHealthLogFile(logFile)
         mycsv=myrestartInstance+"|vsan-health green (vmon)\n"+mycsv
