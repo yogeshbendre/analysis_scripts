@@ -66,7 +66,7 @@ def getFromCatalinaFile(catalinaFile):
     mycsvdata = None
     try:
             myout = BDT.runCommand('cat '+catalinaFile+' | grep " Initialization processed in"')
-            m = myout.split('\\n')[-2]
+            m = myout.split('\n')[-2]
             try:
                 mytime1 = m.split(" ")[0].replace("T"," ").replace("Z","")
                 print("Log: "+m)
@@ -99,7 +99,7 @@ def getFromCatalinaFile(catalinaFile):
     
     try:
             myout = BDT.runCommand('cat '+catalinaFile+' | grep " Server startup in"')
-            m = myout.split('\\n')[-2]
+            m = myout.split('\n')[-2]
             try:
                 mytime1 = m.split(" ")[0].replace("T"," ").replace("Z","")
                 print("Log: "+m)
