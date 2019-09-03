@@ -218,7 +218,7 @@ def parseCompTimes(mycomplogs,hostname,uiPID,uiPIDTime,uiStartTime):
                 
                 if len(str(mprevtime))>25:
                         mprevtime = mprevtime[:-3]
-                d1 = str(mtimestamp0)+"|"+str(hostname)+"|"+str(mcomp)+"|"+str(uiPID)+"|"+str(mtook)+"|"+str(mtime1)+"|"+str(mtime0)+"|"+str(mcomp)+"\n"
+                d1 = str(round(mtimestamp0))+"|"+str(hostname)+"|"+str(mcomp)+"|"+str(uiPID)+"|"+str(mtook)+"|"+str(mtime1)+"|"+str(mtime0)+"|"+str(mcomp)+"\n"
                 print(d1)
                 mytimeddata[mtimestamp0] = d1
                 if d1 is not None:
@@ -254,7 +254,7 @@ def parseCompTimes(mycomplogs,hostname,uiPID,uiPIDTime,uiStartTime):
                     mytimestamp1 = round(mytimestamp1)
                     mytimestamp0 = round(mytimestamp0)
                     mytook = round(mytook)
-                    d1 = str(mytimestamp0)+"|"+str(hostname)+"|"+str(mycomp)+"|"+str(uiPID)+"|"+str(mytook)+"|"+str(mytime1)+"|"+str(mytime0)+"|"+str(mycomp)+"\n"
+                    d1 = str(round(mytimestamp0))+"|"+str(hostname)+"|"+str(mycomp)+"|"+str(uiPID)+"|"+str(mytook)+"|"+str(mytime1)+"|"+str(mytime0)+"|"+str(mycomp)+"\n"
                     mytimeddata[mytimestamp0] = d1
                 except Exception as e4:
                     print('parseCompTimes failed: '+str(e4))
