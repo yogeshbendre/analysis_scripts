@@ -15,8 +15,8 @@ import inspect
 import RCADataFilesUtility as RDF
 
 bootDataJSON = '/var/log/vmware/BootData.json'
-uiBootDataJSON = '/var/log/vmware/uiBootData.json'
-mytextoutputfile = '/var/log/vmware/uiBootData.txt'
+uiBootDataJSON = '/var/log/vmware/vsphere-ui.launcherBootData.json'
+mytextoutputfile = '/var/log/vmware/vsphere-ui.launcherBootData.txt'
 mytextoutputfile2 = '/var/log/vmware/uiPluginData.txt'
 mydeltaoutputfile = '/var/log/vmware/uiDataDelta.txt'
 mydeltaoutputfile2 = '/var/log/vmware/uiPluginDelta.txt'
