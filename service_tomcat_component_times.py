@@ -18,6 +18,7 @@ import BootDataUtility as BDT
 #import BDT as BDT
 
 serviceName=None
+serviceDisplayName=None
 ServiceBootDataJSON = '/var/log/vmware/serviceBootData.json'
 mytextoutputfile = '/var/log/vmware/uiBootData.txt'
 mytextoutputfile2 = '/var/log/vmware/uiPluginData.txt'
@@ -810,6 +811,7 @@ if __name__ == "__main__":
     parser.add_argument("-s","--serviceName", type=str,help="Specify the name of service")
     parser.add_argument("-f","--folder", type=str,help="Specify output folder. Default: /var/log/vmware")
     parser.add_argument("-d","--deltafolder", type=str,help="Specify path for delta folder. File name would be <serviceName>_delta.txt")
+    parser.add_argument("-n","--serviceDisplayName", type=str,help="Specify service display name. File name would be <serviceDisplayName>.txt if this is specified. Default same as serviceName")
     
     
     args = parser.parse_args()
@@ -820,14 +822,21 @@ if __name__ == "__main__":
         print("No service name specified, exiting. Try --help for more info.")
         exit()
     
-    ServiceBootDataJSON = '/var/log/vmware/'+serviceName+'BootData.json'
+    if args.serviceDisplayName:
+        serviceDisplayName = args.serviceDisplayName
+    else:
+        print("No service display name specified, using serviceName")
+        serviceDisplayName = serviceName
+    
+    
+    ServiceBootDataJSON = '/var/log/vmware/'+serviceDisplayName+'BootData.json'
     
     
     if args.folder:
         outputFolder = args.folder
         if(outputFolder[-1]!='/'):
             outputFolder=outputFolder+'/'
-        mytextoutputfile = outputFolder+serviceName+'BootData.txt'
+        mytextoutputfile = outputFolder+serviceDisplayName+'BootData.txt'
         
         
     if args.deltafolder:
@@ -835,7 +844,7 @@ if __name__ == "__main__":
         if(deltafolder[-1]!='/'):
             deltafolder=deltafolder+'/'
         
-        mydeltaoutputfile = deltafolder+ serviceName + '_delta.txt'
+        mydeltaoutputfile = deltafolder+ serviceDisplayName + '_delta.txt'
     
             
     if args.vcName:

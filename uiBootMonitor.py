@@ -592,7 +592,7 @@ if __name__ == "__main__":
         outputFolder = args.folder
         if(outputFolder[-1]!='/'):
             outputFolder=outputFolder+'/'
-        mytextoutputfile = outputFolder+'uiBootData.txt'
+        mytextoutputfile = outputFolder+'vsphere-ui.launcherBootData.txt'
         mytextoutputfile2 = outputFolder+'uiPluginData.txt'
         #myjsonoutputfile = outputFolder+'BootData.json'
     if args.deltafile:
@@ -618,21 +618,19 @@ if __name__ == "__main__":
         
         #myheader = 'date|vcName|component|pid|boot_time_in_sec|last_started_at|last_triggered_at\n'
         myheader = 'date|vcName|component|pid|boot_time_in_sec|last_started_at|last_triggered_at|status\n'
-        if mycsvdata is not None:
-            #RDF.pushToDeltaFile(mydeltaoutputfile,myheader,mycsvdata)
-            RDF.pushToFullFile(mytextoutputfile,myheader,mycsvdata)
         
         if myplugindata is not None:
             print(myplugindata)
             #RDF.pushToDeltaFile(mydeltaoutputfile2,myheader,myplugindata)
-            RDF.pushToFullFile(mytextoutputfile2,myheader,myplugindata)
+            RDF.pushToFullFile(mytextoutputfile,myheader,myplugindata)
+            #RDF.pushToFullFile(mytextoutputfile2,myheader,myplugindata)
             
-            mytextoutputfile3 = mytextoutputfile2.replace('Plugin','CorePlugin')
-            RDF.pushToFullFile(mytextoutputfile3,myheader,mycorecsvdata)
-            mytextoutputfile4 = mytextoutputfile2.replace('Plugin','OtherPlugin')
-            RDF.pushToFullFile(mytextoutputfile4,myheader,myothercsvdata)
-            RDF.pushToDeltaFile(mydeltaoutputfile,myheader,mycorecsvdata)
-            RDF.pushToDeltaFile(mydeltaoutputfile2,myheader,myothercsvdata)
+            #mytextoutputfile3 = mytextoutputfile2.replace('Plugin','CorePlugin')
+            #RDF.pushToFullFile(mytextoutputfile3,myheader,mycorecsvdata)
+            #mytextoutputfile4 = mytextoutputfile2.replace('Plugin','OtherPlugin')
+            #RDF.pushToFullFile(mytextoutputfile4,myheader,myothercsvdata)
+            RDF.pushToDeltaFile(mydeltaoutputfile,myheader,myplugindata)
+            #RDF.pushToDeltaFile(mydeltaoutputfile2,myheader,myothercsvdata)
         
         
         
