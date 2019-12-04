@@ -8,3 +8,4 @@ python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYS
 python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s vsan-health -n vmware-vsan-health > /var/log/vmware/vsanhealthout_analysis.txt 2> /var/log/vmware/vsanhealthout_analysis.txt
 python3 service_tomcat_component_times.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ -s eam -n vmware-eam.launcher > /var/log/vmware/eamout_analysis.txt 2> /var/log/vmware/eamout_analysis.txt
 python3 vmon_health_report.py -f /var/log/vmware/vapi/monitoring/SYSTEM-LEVEL-UTILIZATION/ -d ../ > /var/log/vmware/servicehealthout_analysis.txt 2> /var/log/vmware/servicehealthout_analysis.txt
+cp /var/log/vmware/BootData.json /var/log/BootData.json
