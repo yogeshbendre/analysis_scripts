@@ -42,7 +42,8 @@ def getFromVmonFile(vmonFile,mintimestamp):
                 
                 
                 l1 = l.translate(str.maketrans('', '', string.punctuation))
-                myservicedata = l.split('[query_service_health_vmon.py:81]')[1].strip().split(" ")
+                #myservicedata = l.split('[query_service_health_vmon.py:81]')[1].strip().split(" ")
+                myservicedata = "".join(l.split('[query_service_health_vmon.py')[1].split(']')[1:]).strip().split(" ")
                 myservice = myservicedata[0]
                 myhealth = myservicedata[2].replace("[","").replace("'","").replace(",","")
                 mymsg = "NA"
